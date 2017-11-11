@@ -1,4 +1,4 @@
-FROM golang:1.7.5 as build
+FROM golang:1.8.5 as build
 
 RUN mkdir -p /go/src/github.com/alexellis/derek
 WORKDIR /go/src/github.com/alexellis/derek
