@@ -156,6 +156,23 @@ func handleComment(req types.IssueCommentOuter) {
 		}
 
 		break
+	case "SetTitle":
+		allowed := isMaintainer(req.Comment.User.Login, req.Repository)
+		fmt.Printf("%s wants to set the title of issue #%d - allowed? %t\n", req.Comment.User.Login, req.Issue.Number, allowed)
+
+		if allowed {
+			client, ctx := makeClient()
+
+			input := &github.IssueRequest{Title: &command.Value}
+
+			_, _, err := client.Issues.Edit(ctx, req.Repository.Owner.Login, req.Repository.Name, req.Issue.Number, input)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			fmt.Printf("Request to set the title of issue #%d by %s was successful.\n", req.Issue.Number, req.Comment.User.Login)
+		}
+
+		break
 	default:
 		log.Fatalln("Unable to work with comment: " + req.Comment.Body)
 		break
@@ -172,6 +189,7 @@ func parse(body string) *types.CommentAction {
 		"Derek unassign: ":     "Unassign",
 		"Derek close":          "close",
 		"Derek reopen":         "reopen",
+		"Derek set title: ":    "SetTitle",
 	}
 
 	for trigger, commandType := range commands {
