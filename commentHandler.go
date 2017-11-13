@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/alexellis/derek/auth"
@@ -160,7 +161,8 @@ func handleComment(req types.IssueCommentOuter) {
 		allowed := isMaintainer(req.Comment.User.Login, req.Repository)
 		fmt.Printf("%s wants to set the title of issue #%d - allowed? %t\n", req.Comment.User.Login, req.Issue.Number, allowed)
 
-		if allowed {
+		if allowed && command.Value != "" {
+
 			client, ctx := makeClient()
 
 			input := &github.IssueRequest{Title: &command.Value}
@@ -213,7 +215,10 @@ func isValidCommand(body string, trigger string) bool {
 }
 
 func getMaintainers(owner string, repository string) []string {
-	client := http.Client{}
+
+	client := http.Client{
+		Timeout: 60 * time.Second,
+	}
 
 	maintainersFile := getEnv(maintainersFileEnv, defaultMaintFile)
 	maintainersFile = fmt.Sprintf("https://github.com/%s/%s/raw/master/%s", owner, repository, strings.Trim(maintainersFile, "/"))
@@ -251,7 +256,7 @@ func isMaintainer(userLogin string, repository types.Repository) bool {
 	return allow
 }
 
-func getEnv(envVar, assumed string) string {
+func getEnv(envVar string, assumed string) string {
 	if value, exists := os.LookupEnv(envVar); exists {
 		return value
 	}
