@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/google/go-github/github"
 	"github.com/alexellis/derek/auth"
 	"github.com/alexellis/derek/types"
-	"github.com/google/go-github/github"
 )
 
 const open = "open"

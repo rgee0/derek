@@ -59,7 +59,7 @@ type CommentAction struct {
 	Value string
 }
 
-type DerekControl struct {
+type DerekConfig struct {
 	Features    []string
 	Maintainers []string
 }
