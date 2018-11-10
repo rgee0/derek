@@ -14,6 +14,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/alexellis/derek/types"
+	"github.com/imdario/mergo"
 )
 
 const configFile = ".DEREK.yml"
@@ -81,7 +82,7 @@ func validateRedirectURL(url string) error {
 }
 
 func getRepoConfig(owner string, repository string) (*types.DerekRepoConfig, error) {
-	var config types.DerekRepoConfig
+	var config, remoteConfig types.DerekRepoConfig
 
 	client := http.Client{
 		Timeout: 30 * time.Second,
@@ -101,7 +102,13 @@ func getRepoConfig(owner string, repository string) (*types.DerekRepoConfig, err
 			return nil, err
 		}
 		bytesConfig = readConfigFromURL(client, config.Redirect)
-		err = parseConfig(bytesConfig, &config)
+		err = parseConfig(bytesConfig, &remoteConfig)
+		if err != nil {
+			return nil, err
+		}
+
+		err = mergo.Merge(&config, remoteConfig)
+
 		if err != nil {
 			return nil, err
 		}

@@ -95,3 +95,12 @@ func Test_hasNoDcoLabel(t *testing.T) {
 		})
 	}
 }
+
+// DerekRepoConfig is a config for a Derek-enabled repository
+type DerekRepoConfig struct {
+	Redirect        string
+	Features        []string
+	Maintainers     []string
+	Curators        []string
+	ContributingURL string `yaml:"contributing_url"`
+}
